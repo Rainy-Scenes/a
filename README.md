@@ -1,3 +1,3 @@
 # 歌姫シミュレーター
 
-https://claude.ai/artifact/Lp6vfAv2HhMvm7HWiPWBpB
+https://rainy-scenes.github.io/a/

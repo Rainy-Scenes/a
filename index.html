@@ -1373,7 +1373,18 @@ function writeJ(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}c
 // 入力値は計算機とシミュレータで共有（相手ページの項目は残したまま上書き）
 const HAD_LOCAL=!!readJ(SKEY); // このブラウザに入力が残っていたか（なければアカウントの入力を使う）
 function saveInputs(){const o=readJ(SKEY)||{};Object.assign(o,snapshot());const before=JSON.stringify(readJ(SKEY));writeJ(SKEY,o);if(JSON.stringify(o)!==before){writeJ(SKEY+'.t',Date.now());try{const P=(window.parent&&window.parent!==window)?window.parent:window;P.cloudSync&&P.cloudSync()}catch(e){}}}
-function loadInputs(){let o=readJ(SKEY);if(!o){o=Object.assign({},readJ('auditionSim.v1')||{},readJ('oneShime.v2')||{});if(!Object.keys(o).length)o=null}if(o)apply(o)}
+// 初めて開いたとき（このブラウザに入力が何もない）だけ、プロデュースカードを【ジャンク・ション】樋口円香にして、札とパッシブを入れておく（ユーザーの希望 2026-11-19）。
+// アカウント同期がある Artifact では、このあとアカウント側の入力が届けばそちらで上書きされる（HAD_LOCAL は既定を入れる前に決まる）
+const DEFAULT_PCARD={idol:'21',card:'【ジャンク・ション】樋口円香'};
+function applyDefaultInputs(){
+  try{
+    const c=findCard('p',DEFAULT_PCARD.card);if(!c)return;
+    $('pki').value=DEFAULT_PCARD.idol;$('pki').dispatchEvent(new Event('change'));
+    $('pkc').value=c.n;$('pkc').dispatchEvent(new Event('change'));
+    if(!passives.length&&!$('pkp').hidden)$('pkp').click();
+  }catch(e){}
+}
+function loadInputs(){let o=readJ(SKEY);if(!o){o=Object.assign({},readJ('auditionSim.v1')||{},readJ('oneShime.v2')||{});if(!Object.keys(o).length)o=null}if(o)apply(o);else applyDefaultInputs()}
 function getPresets(){let p=readJ(SPKEY);if(!p)p=Object.assign({},readJ('auditionSim.presets.v1')||{},readJ('oneShime.presets.v2')||{});return p||{}}
 function setPresets(p){const ok=writeJ(SPKEY,p);try{const P=(window.parent&&window.parent!==window)?window.parent:window;P.cloudSync&&P.cloudSync()}catch(e){}return ok}
 function presetSnapshot(){return Object.assign({},readJ(SKEY)||{},snapshot())}
